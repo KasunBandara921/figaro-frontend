@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes:wght@400&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-lato text-gray-800;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-playfair;
+}
+
+.hero {
+  @apply min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black text-white;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-black transition-all duration-300;
+}
+
+.section-title {
+  @apply text-4xl md:text-5xl font-playfair font-bold mb-8;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden;
+}
+
+/* Smooth scroll behavior */
+@supports (scroll-behavior: smooth) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Responsive images */
+img {
+  @apply max-w-full h-auto;
+}
