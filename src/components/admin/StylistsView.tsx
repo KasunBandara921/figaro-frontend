@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import EditProfileButton from './EditProfileButton';
-import ManageScheduleButton from './ManageScheduleButton';
 import EditProfileModal, { Stylist } from './EditProfileModal';
-import ManageScheduleModal from './ManageScheduleModal';
 import { apiRequest } from '@/lib/api';
 
 const StarIcon = () => (
@@ -15,12 +13,10 @@ const StarIcon = () => (
 
 const StylistCard = ({ 
   stylist, 
-  onEditClick,
-  onScheduleClick
+  onEditClick
 }: { 
   stylist: Stylist, 
-  onEditClick: () => void,
-  onScheduleClick: () => void
+  onEditClick: () => void
 }) => (
   <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
     <div className="flex items-center space-x-4 mb-6">
@@ -47,16 +43,14 @@ const StylistCard = ({
       </div>
     </div>
     
-    <div className="flex grid-cols-2 gap-3 pt-4 border-t border-gray-50">
+    <div className="pt-4 border-t border-gray-50">
       <EditProfileButton onClick={onEditClick} />
-      <ManageScheduleButton onClick={onScheduleClick} />
     </div>
   </div>
 );
 
 export default function StylistsView() {
   const [selectedStylist, setSelectedStylist] = useState<Stylist | null>(null);
-  const [selectedStylistForSchedule, setSelectedStylistForSchedule] = useState<Stylist | null>(null);
   const [stylists, setStylists] = useState<Stylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -125,7 +119,6 @@ export default function StylistsView() {
                 key={stylist.name} 
                 stylist={stylist} 
                 onEditClick={() => setSelectedStylist(stylist)} 
-                onScheduleClick={() => setSelectedStylistForSchedule(stylist)}
               />
             ))}
           </div>
@@ -141,12 +134,6 @@ export default function StylistsView() {
         />
       )}
 
-      {selectedStylistForSchedule && (
-        <ManageScheduleModal 
-          stylist={selectedStylistForSchedule} 
-          onClose={() => setSelectedStylistForSchedule(null)} 
-        />
-      )}
     </>
   );
 }

@@ -50,6 +50,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('bookings');
   const [appointments, setAppointments] = useState<any[]>([]);
   const [stylistsCount, setStylistsCount] = useState(0);
+  const [stylists, setStylists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeDropdownId, setActiveDropdownId] = useState<number | null>(null);
@@ -59,6 +60,7 @@ export default function AdminDashboard() {
       const appointmentData = await apiRequest('/appointments');
       const stylistData = await apiRequest('/stylists');
       setAppointments(appointmentData || []);
+      setStylists(stylistData || []);
       setStylistsCount(stylistData ? stylistData.length : 0);
     } catch (err: any) {
       setError(err.message || 'Failed to load dashboard metrics. Access denied.');

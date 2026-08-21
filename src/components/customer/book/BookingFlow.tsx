@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SelectServices from './services/SelectServices';
 import SelectStylist from './SelectStylist';
 import SelectDateTime from './SelectDateTime';
@@ -12,6 +12,14 @@ import { useRouter } from 'next/navigation';
 export default function BookingFlow() {
   const [step, setStep] = useState(1);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if (!token || role !== 'CUSTOMER') {
+      router.push('/login?redirect=/customer/book');
+    }
+  }, [router]);
 
   // Shared booking state
   const [selectedServices, setSelectedServices] = useState<any[]>([]);
