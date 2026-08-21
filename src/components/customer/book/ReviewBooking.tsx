@@ -52,17 +52,85 @@ const DollarIcon = () => (
   </svg>
 );
 
-export default function ReviewBooking({ onBack, onNext }: { onBack: () => void, onNext: () => void }) {
+import { apiRequest } from '@/lib/api';
+
+export default function ReviewBooking({ 
+  selectedServices,
+  selectedStylist,
+  selectedDate,
+  selectedTime,
+  customerDetails,
+  setBookingReference,
+  onBack, 
+  onNext 
+}: { 
+  selectedServices: any[],
+  selectedStylist: any | null,
+  selectedDate: string,
+  selectedTime: string,
+  customerDetails: { fullName: string, email: string, phone: string, specialRequests: string },
+  setBookingReference: (ref: string) => void,
+  onBack: () => void, 
+  onNext: () => void 
+}) {
   const [promoCode, setPromoCode] = React.useState('');
+  const [promoApplied, setPromoApplied] = React.useState(false);
   const [promoError, setPromoError] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState('');
+
+  const subtotal = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
+  const discount = promoApplied ? subtotal * 0.1 : 0;
+  const total = subtotal - discount;
+
+  const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
 
   const handleApplyPromo = () => {
-    if (promoCode && promoCode !== 'ELITE10') {
-      setPromoError(true);
-    } else {
+    if (promoCode === 'ELITE10') {
+      setPromoApplied(true);
       setPromoError(false);
+    } else {
+      setPromoApplied(false);
+      setPromoError(true);
     }
   };
+
+  const handleConfirmBooking = async () => {
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const response = await apiRequest('/appointments', {
+        method: 'POST',
+        body: JSON.stringify({
+          customerName: customerDetails.fullName,
+          customerEmail: customerDetails.email,
+          customerPhone: customerDetails.phone,
+          stylist: selectedStylist ? { id: selectedStylist.id } : null,
+          service: selectedServices.length > 0 ? { id: selectedServices[0].id } : null,
+          appointmentDate: selectedDate,
+          appointmentTime: selectedTime
+        })
+      });
+
+      // Set confirmation reference
+      const refId = response && response.id ? `REF-BK${String(response.id).padStart(3, '0')}` : 'REF-BK003';
+      setBookingReference(refId);
+      onNext();
+    } catch (err: any) {
+      setSubmitError(err.message || 'Failed to submit appointment booking. Make sure you are logged in.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const getDisplayDate = () => {
+    if (!selectedDate) return '';
+    const parts = selectedDate.split('-');
+    const day = parseInt(parts[2], 10);
+    return `May ${day}, 2026`;
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-8">
       {/* Back Button */}
@@ -91,7 +159,7 @@ export default function ReviewBooking({ onBack, onNext }: { onBack: () => void, 
               <CalendarIcon />
               <div>
                 <p className="text-xs text-gray-400 font-lato mb-0.5">Date & Time</p>
-                <p className="text-sm font-medium text-gray-900 font-lato">May 8, 2026 at 15:00</p>
+                <p className="text-sm font-medium text-gray-900 font-lato">{getDisplayDate()} at {selectedTime}</p>
               </div>
             </div>
             
@@ -99,7 +167,7 @@ export default function ReviewBooking({ onBack, onNext }: { onBack: () => void, 
               <UserIcon />
               <div>
                 <p className="text-xs text-gray-400 font-lato mb-0.5">Stylist</p>
-                <p className="text-sm font-medium text-gray-900 font-lato">Alex Rodriguez</p>
+                <p className="text-sm font-medium text-gray-900 font-lato">{selectedStylist ? selectedStylist.name : 'Any Stylist'}</p>
               </div>
             </div>
             
@@ -107,23 +175,25 @@ export default function ReviewBooking({ onBack, onNext }: { onBack: () => void, 
               <ClockIcon />
               <div>
                 <p className="text-xs text-gray-400 font-lato mb-0.5">Duration</p>
-                <p className="text-sm font-medium text-gray-900 font-lato">60 minutes</p>
+                <p className="text-sm font-medium text-gray-900 font-lato">{totalDuration} minutes</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Services */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 font-lato text-lg">Services</h3>
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+          <h3 className="font-semibold text-gray-900 mb-2 font-lato text-lg">Selected Services</h3>
           
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-gray-900 font-lato">Haircut & Style</p>
-              <p className="text-xs text-gray-500 font-lato mt-0.5">60 min</p>
+          {selectedServices.map(service => (
+            <div key={service.id} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+              <div>
+                <p className="text-sm font-medium text-gray-900 font-lato">{service.title}</p>
+                <p className="text-xs text-gray-505 font-lato mt-0.5">{service.duration} min</p>
+              </div>
+              <span className="text-sm font-medium text-gray-900 font-lato">${service.price}</span>
             </div>
-            <span className="text-sm font-medium text-gray-900 font-lato">$65</span>
-          </div>
+          ))}
         </div>
 
         {/* Contact Information */}
@@ -133,15 +203,15 @@ export default function ReviewBooking({ onBack, onNext }: { onBack: () => void, 
           <div className="space-y-4">
             <div className="flex items-center text-sm text-gray-800 font-lato">
               <UserIcon />
-              <span>kasun bandara</span>
+              <span>{customerDetails.fullName}</span>
             </div>
             <div className="flex items-center text-sm text-gray-800 font-lato">
               <MailIcon />
-              <span>bandarakasun495@gmail.com</span>
+              <span>{customerDetails.email}</span>
             </div>
             <div className="flex items-center text-sm text-gray-800 font-lato">
               <PhoneIcon />
-              <span>0123454568</span>
+              <span>{customerDetails.phone}</span>
             </div>
           </div>
         </div>
@@ -173,25 +243,39 @@ export default function ReviewBooking({ onBack, onNext }: { onBack: () => void, 
             {promoError && (
               <p className="text-red-500 text-sm font-lato mt-2">Invalid promo code</p>
             )}
+            {promoApplied && (
+              <p className="text-green-600 text-sm font-lato mt-2">10% discount applied!</p>
+            )}
           </div>
 
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center text-sm font-lato">
               <span className="text-gray-600">Subtotal</span>
-              <span className="text-gray-900 font-medium">$65</span>
+              <span className="text-gray-900 font-medium">${subtotal.toFixed(2)}</span>
             </div>
+            {promoApplied && (
+              <div className="flex justify-between items-center text-sm font-lato text-green-600">
+                <span>Discount (10%)</span>
+                <span>-${discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center pt-3 border-t border-gray-100">
               <span className="text-gray-900 font-semibold font-lato">Total</span>
-              <span className="text-gray-900 font-bold text-lg font-lato">$65.00</span>
+              <span className="text-gray-900 font-bold text-lg font-lato">${total.toFixed(2)}</span>
             </div>
           </div>
 
+          {submitError && (
+            <p className="text-red-500 text-sm font-lato mb-4">{submitError}</p>
+          )}
+
           <button 
-            onClick={onNext}
-            className="w-full flex items-center justify-center py-3.5 bg-[#0F172A] hover:bg-black text-white rounded-lg font-medium transition-colors font-lato shadow-md"
+            disabled={submitting}
+            onClick={handleConfirmBooking}
+            className="w-full flex items-center justify-center py-3.5 bg-[#0F172A] hover:bg-black text-white rounded-lg font-medium transition-colors font-lato shadow-md disabled:opacity-50"
           >
             <DollarIcon />
-            Confirm Booking
+            {submitting ? 'Confirming Booking...' : 'Confirm Booking'}
           </button>
           
           <p className="text-center text-xs text-gray-400 mt-3 font-lato">

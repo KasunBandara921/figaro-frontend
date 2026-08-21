@@ -52,7 +52,35 @@ const HomeIcon = () => (
   </svg>
 );
 
-export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?: () => void, onBookAnother?: () => void }) {
+export default function BookingConfirmation({ 
+  selectedServices,
+  selectedStylist,
+  selectedDate,
+  selectedTime,
+  customerDetails,
+  bookingReference,
+  onHome, 
+  onBookAnother 
+}: { 
+  selectedServices: any[],
+  selectedStylist: any | null,
+  selectedDate: string,
+  selectedTime: string,
+  customerDetails: { fullName: string, email: string, phone: string },
+  bookingReference: string,
+  onHome?: () => void, 
+  onBookAnother?: () => void 
+}) {
+  const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
+  const totalPrice = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
+
+  const getDisplayDate = () => {
+    if (!selectedDate) return '';
+    const parts = selectedDate.split('-');
+    const day = parseInt(parts[2], 10);
+    return `May ${day}, 2026`;
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
       <div className="bg-[#F0FDF4] rounded-2xl p-8 md:p-12 shadow-sm border border-green-100">
@@ -71,7 +99,7 @@ export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?
           {/* Reference Number */}
           <div className="bg-white rounded-xl p-5 border border-green-50 shadow-sm">
             <p className="text-xs text-gray-400 uppercase tracking-wider mb-1 font-semibold font-lato">Booking Reference</p>
-            <p className="text-xl font-medium text-gray-900 font-lato">REF-BK003</p>
+            <p className="text-xl font-medium text-gray-900 font-lato">{bookingReference}</p>
           </div>
 
           {/* Appointment Details */}
@@ -80,7 +108,7 @@ export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?
               <CalendarIcon />
               <div>
                 <p className="text-xs text-gray-400 font-lato mb-0.5">Date & Time</p>
-                <p className="text-sm font-medium text-gray-900 font-lato">May 14, 2026 at 16:00</p>
+                <p className="text-sm font-medium text-gray-900 font-lato">{getDisplayDate()} at {selectedTime}</p>
               </div>
             </div>
             
@@ -88,7 +116,7 @@ export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?
               <UserIcon />
               <div>
                 <p className="text-xs text-gray-400 font-lato mb-0.5">Stylist</p>
-                <p className="text-sm font-medium text-gray-900 font-lato">Alex Rodriguez</p>
+                <p className="text-sm font-medium text-gray-900 font-lato">{selectedStylist ? selectedStylist.name : 'Any Stylist'}</p>
               </div>
             </div>
             
@@ -96,7 +124,7 @@ export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?
               <ClockIcon />
               <div>
                 <p className="text-xs text-gray-400 font-lato mb-0.5">Duration</p>
-                <p className="text-sm font-medium text-gray-900 font-lato">60 minutes</p>
+                <p className="text-sm font-medium text-gray-900 font-lato">{totalDuration} minutes</p>
               </div>
             </div>
           </div>
@@ -105,14 +133,16 @@ export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?
           <div className="bg-white rounded-xl p-5 border border-green-50 shadow-sm">
             <p className="text-xs text-gray-400 font-lato mb-3">Services</p>
             
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-sm font-medium text-gray-800 font-lato">Haircut & Style</span>
-              <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-lato">$65</span>
-            </div>
+            {selectedServices.map(service => (
+              <div key={service.id} className="flex justify-between items-center mb-2 last:mb-0">
+                <span className="text-sm font-medium text-gray-800 font-lato">{service.title}</span>
+                <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded font-lato">${service.price}</span>
+              </div>
+            ))}
             
-            <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
+            <div className="border-t border-gray-100 pt-4 mt-3 flex justify-between items-center">
               <span className="text-sm font-semibold text-gray-900 font-lato">Total</span>
-              <span className="text-base font-bold text-gray-900 font-lato">$65.00</span>
+              <span className="text-base font-bold text-gray-900 font-lato">${totalPrice.toFixed(2)}</span>
             </div>
           </div>
 
@@ -120,11 +150,11 @@ export default function BookingConfirmation({ onHome, onBookAnother }: { onHome?
           <div className="bg-white rounded-xl p-5 border border-green-50 shadow-sm space-y-3">
             <div className="flex items-center text-sm text-gray-600 font-lato">
               <MailIcon />
-              <span>Confirmation sent to <strong>bandarakasun495@gmail.com</strong></span>
+              <span>Confirmation sent to <strong>{customerDetails.email}</strong></span>
             </div>
             <div className="flex items-center text-sm text-gray-600 font-lato">
               <PhoneIcon />
-              <span>We'll send a reminder to <strong>1234568523</strong></span>
+              <span>We'll send a reminder to <strong>{customerDetails.phone}</strong></span>
             </div>
           </div>
 

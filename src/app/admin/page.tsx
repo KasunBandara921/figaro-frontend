@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CalendarView from '@/components/admin/CalendarView';
 import StylistsView from '@/components/admin/StylistsView';
+import { apiRequest } from '@/lib/api';
 
 // Simple SVG Icons
 const CalendarIcon = () => (
@@ -46,7 +47,74 @@ const MoreVerticalIcon = () => (
 );
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('calendar');
+  const [activeTab, setActiveTab] = useState('bookings');
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [stylistsCount, setStylistsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        const appointmentData = await apiRequest('/appointments');
+        const stylistData = await apiRequest('/stylists');
+        setAppointments(appointmentData || []);
+        setStylistsCount(stylistData ? stylistData.length : 0);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load dashboard metrics. Access denied.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDashboardData();
+  }, []);
+
+  const totalBookings = appointments.length;
+  const activeBookings = appointments.filter(a => a.status === 'CONFIRMED' || a.status === 'PENDING').length;
+  
+  const completedRevenue = appointments
+    .filter(a => a.status === 'COMPLETED')
+    .reduce((sum, a) => sum + (a.service ? a.service.price : 0), 0);
+
+  const pendingRevenue = appointments
+    .filter(a => a.status === 'CONFIRMED' || a.status === 'PENDING')
+    .reduce((sum, a) => sum + (a.service ? a.service.price : 0), 0);
+
+  const getDisplayDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const parts = dateStr.split('-');
+      const year = parts[0];
+      const monthIndex = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${months[monthIndex]} ${day}, ${year}`;
+    } catch {
+      return dateStr;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 pt-32 pb-12 text-center text-gray-600 font-lato">
+        Loading admin dashboard...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 pt-32 pb-12 text-center text-red-500 font-lato px-4">
+        <div className="max-w-md mx-auto bg-white p-6 rounded-xl border border-red-100 shadow-sm">
+          <h2 className="text-lg font-semibold mb-2">Unauthorized Access</h2>
+          <p className="text-sm text-gray-500 mb-4">{error}</p>
+          <a href="/login" className="px-6 py-2 bg-black text-white rounded-lg text-sm transition-colors hover:bg-neutral-800">
+            Go to Login
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -67,8 +135,8 @@ export default function AdminDashboard() {
               <CalendarIcon />
             </div>
             <div className="mt-4">
-              <h2 className="text-3xl font-lato font-medium text-gray-900">2</h2>
-              <p className="text-sm text-gray-500 mt-1">2 confirmed</p>
+              <h2 className="text-3xl font-lato font-medium text-gray-900">{totalBookings}</h2>
+              <p className="text-sm text-gray-500 mt-1">{activeBookings} active</p>
             </div>
           </div>
 
@@ -78,8 +146,10 @@ export default function AdminDashboard() {
               <DollarSignIcon />
             </div>
             <div className="mt-4">
-              <h2 className="text-3xl font-lato font-medium text-gray-900">$0.00</h2>
-              <p className="text-sm text-gray-500 mt-1">0 appointments</p>
+              <h2 className="text-3xl font-lato font-medium text-gray-900">${completedRevenue.toFixed(2)}</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {appointments.filter(a => a.status === 'COMPLETED').length} appointments
+              </p>
             </div>
           </div>
 
@@ -89,8 +159,8 @@ export default function AdminDashboard() {
               <ClockIcon />
             </div>
             <div className="mt-4">
-              <h2 className="text-3xl font-lato font-medium text-gray-900">$165.00</h2>
-              <p className="text-sm text-gray-500 mt-1">2 upcoming</p>
+              <h2 className="text-3xl font-lato font-medium text-gray-900">${pendingRevenue.toFixed(2)}</h2>
+              <p className="text-sm text-gray-500 mt-1">{activeBookings} upcoming</p>
             </div>
           </div>
 
@@ -100,7 +170,7 @@ export default function AdminDashboard() {
               <UsersIcon />
             </div>
             <div className="mt-4">
-              <h2 className="text-3xl font-lato font-medium text-gray-900">4</h2>
+              <h2 className="text-3xl font-lato font-medium text-gray-900">{stylistsCount}</h2>
               <p className="text-sm text-gray-500 mt-1">All available</p>
             </div>
           </div>
@@ -137,10 +207,18 @@ export default function AdminDashboard() {
             </div>
 
             <div className="px-6 pb-4 flex flex-wrap gap-2">
-              <button className="px-4 py-1.5 bg-gray-900 text-white rounded-full text-sm font-medium transition-colors">All (2)</button>
-              <button className="px-4 py-1.5 bg-transparent text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">Confirmed (2)</button>
-              <button className="px-4 py-1.5 bg-transparent text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">Completed (0)</button>
-              <button className="px-4 py-1.5 bg-transparent text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">Cancelled (0)</button>
+              <button className="px-4 py-1.5 bg-gray-900 text-white rounded-full text-sm font-medium transition-colors">
+                All ({appointments.length})
+              </button>
+              <button className="px-4 py-1.5 bg-transparent text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+                Confirmed ({appointments.filter(a => a.status === 'CONFIRMED' || a.status === 'PENDING').length})
+              </button>
+              <button className="px-4 py-1.5 bg-transparent text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+                Completed ({appointments.filter(a => a.status === 'COMPLETED').length})
+              </button>
+              <button className="px-4 py-1.5 bg-transparent text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+                Cancelled ({appointments.filter(a => a.status === 'CANCELLED').length})
+              </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -158,50 +236,49 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  <tr className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">REF-BK001</td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">Jessica Smith</div>
-                      <div className="text-xs text-gray-500 mt-0.5">jessica@email.com</div>
-                    </td>
-                    <td className="px-6 py-4">Sarah Johnson</td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900">May 5, 2026</div>
-                      <div className="text-xs text-gray-500 mt-0.5">10:00</div>
-                    </td>
-                    <td className="px-6 py-4">Haircut & Style, Deep Conditioning</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">$100.00</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white">
-                        confirmed
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <MoreVerticalIcon />
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-mono text-xs text-gray-500">REF-BK002</td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">David Lee</div>
-                      <div className="text-xs text-gray-500 mt-0.5">david@email.com</div>
-                    </td>
-                    <td className="px-6 py-4">Mike Chen</td>
-                    <td className="px-6 py-4">
-                      <div className="text-gray-900">May 6, 2026</div>
-                      <div className="text-xs text-gray-500 mt-0.5">14:00</div>
-                    </td>
-                    <td className="px-6 py-4">Haircut & Style</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">$65.00</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white">
-                        confirmed
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <MoreVerticalIcon />
-                    </td>
-                  </tr>
+                  {appointments.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-8 text-center text-gray-500 font-lato">
+                        No appointments found.
+                      </td>
+                    </tr>
+                  ) : (
+                    appointments.map((appointment) => (
+                      <tr key={appointment.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-4 font-mono text-xs text-gray-500">
+                          REF-BK{String(appointment.id).padStart(3, '0')}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-gray-900">{appointment.customerName}</div>
+                          <div className="text-xs text-gray-500 mt-0.5">{appointment.customerEmail}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {appointment.stylist ? appointment.stylist.name : 'Any Stylist'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-gray-900">{getDisplayDate(appointment.appointmentDate)}</div>
+                          <div className="text-xs text-gray-500 mt-0.5">{appointment.appointmentTime}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {appointment.service ? appointment.service.name : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                          {appointment.service ? `$${appointment.service.price.toFixed(2)}` : '$0.00'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase ${
+                            appointment.status === 'COMPLETED' ? 'bg-green-500 text-white' :
+                            appointment.status === 'CANCELLED' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+                          }`}>
+                            {appointment.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <MoreVerticalIcon />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

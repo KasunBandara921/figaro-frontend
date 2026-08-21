@@ -9,14 +9,17 @@ const ArrowLeftIcon = () => (
   </svg>
 );
 
-export default function CustomerDetails({ onBack, onNext }: { onBack: () => void, onNext: () => void }) {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    specialRequests: ''
-  });
-
+export default function CustomerDetails({ 
+  formData,
+  setFormData,
+  onBack, 
+  onNext 
+}: { 
+  formData: { fullName: string, email: string, phone: string, specialRequests: string },
+  setFormData: React.Dispatch<React.SetStateAction<{ fullName: string, email: string, phone: string, specialRequests: string }>>,
+  onBack: () => void, 
+  onNext: () => void 
+}) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));

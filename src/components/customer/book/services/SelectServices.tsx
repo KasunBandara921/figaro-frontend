@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { apiRequest } from '@/lib/api';
 
 // Reusable SVGs
 const ClockIcon = () => (
@@ -18,72 +19,73 @@ const DollarIcon = () => (
 );
 
 interface Service {
-  id: string;
+  id: number;
   title: string;
   description: string;
   duration: number;
   price: number;
 }
 
-export default function SelectServices({ onNext }: { onNext?: () => void }) {
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+export default function SelectServices({ 
+  selectedServices,
+  setSelectedServices,
+  onNext 
+}: { 
+  selectedServices: Service[],
+  setSelectedServices: React.Dispatch<React.SetStateAction<Service[]>>,
+  onNext?: () => void 
+}) {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const services: Service[] = [
-    {
-      id: "haircut-style",
-      title: "Haircut & Style",
-      description: "Professional cut and styling",
-      duration: 60,
-      price: 65
-    },
-    {
-      id: "hair-coloring",
-      title: "Hair Coloring",
-      description: "Full color treatment with toning",
-      duration: 120,
-      price: 145
-    },
-    {
-      id: "highlights",
-      title: "Highlights",
-      description: "Partial or full highlights",
-      duration: 150,
-      price: 180
-    },
-    {
-      id: "blowout",
-      title: "Blowout",
-      description: "Professional blow dry and style",
-      duration: 45,
-      price: 45
-    },
-    {
-      id: "deep-conditioning",
-      title: "Deep Conditioning",
-      description: "Restorative hair treatment",
-      duration: 30,
-      price: 35
-    },
-    {
-      id: "special-updo",
-      title: "Special Occasion Updo",
-      description: "Elegant updo for events",
-      duration: 90,
-      price: 95
+  useEffect(() => {
+    async function loadServices() {
+      try {
+        const data = await apiRequest('/services');
+        const formatted = data.map((item: any) => ({
+          id: item.id,
+          title: item.name,
+          description: item.description,
+          duration: item.durationMinutes,
+          price: item.price
+        }));
+        setServices(formatted);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load services.');
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    loadServices();
+  }, []);
 
-  const toggleService = (id: string) => {
-    if (selectedServices.includes(id)) {
-      setSelectedServices(selectedServices.filter(serviceId => serviceId !== id));
+  const toggleService = (service: Service) => {
+    if (selectedServices.some(s => s.id === service.id)) {
+      setSelectedServices(selectedServices.filter(s => s.id !== service.id));
     } else {
-      setSelectedServices([...selectedServices, id]);
+      setSelectedServices([...selectedServices, service]);
     }
   };
 
-  const selectedData = services.filter(s => selectedServices.includes(s.id));
-  const totalDuration = selectedData.reduce((acc, curr) => acc + curr.duration, 0);
-  const totalPrice = selectedData.reduce((acc, curr) => acc + curr.price, 0);
+  const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
+  const totalPrice = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 text-center text-gray-600 font-lato">
+        Loading services...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 text-center text-red-500 font-lato">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -96,11 +98,11 @@ export default function SelectServices({ onNext }: { onNext?: () => void }) {
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {services.map((service) => {
-          const isSelected = selectedServices.includes(service.id);
+          const isSelected = selectedServices.some(s => s.id === service.id);
           return (
             <div 
               key={service.id}
-              onClick={() => toggleService(service.id)}
+              onClick={() => toggleService(service)}
               className={`relative rounded-xl p-6 cursor-pointer transition-all border ${
                 isSelected 
                   ? 'bg-purple-50/20 border-purple-500 ring-1 ring-purple-500 shadow-md' 

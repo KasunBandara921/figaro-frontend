@@ -28,15 +28,41 @@ const ClockIcon = () => (
   </svg>
 );
 
-export default function SelectDateTime({ onBack, onNext }: { onBack: () => void, onNext: () => void }) {
-  const [selectedDate, setSelectedDate] = useState<number | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-
+export default function SelectDateTime({ 
+  selectedDate, 
+  setSelectedDate, 
+  selectedTime, 
+  setSelectedTime,
+  selectedStylist,
+  selectedServices,
+  onBack, 
+  onNext 
+}: { 
+  selectedDate: string,
+  setSelectedDate: (date: string) => void,
+  selectedTime: string,
+  setSelectedTime: (time: string) => void,
+  selectedStylist: any | null,
+  selectedServices: any[],
+  onBack: () => void, 
+  onNext: () => void 
+}) {
   const availableTimes = [
     "09:00", "10:00", "11:00",
     "12:00", "14:00", "15:00",
     "16:00", "17:00"
   ];
+
+  const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
+
+  const getFullDateString = (day: number) => {
+    const formattedDay = day < 10 ? `0${day}` : day;
+    return `2026-05-${formattedDay}`;
+  };
+
+  const handleDateClick = (day: number) => {
+    setSelectedDate(getFullDateString(day));
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -52,7 +78,9 @@ export default function SelectDateTime({ onBack, onNext }: { onBack: () => void,
       {/* Header */}
       <div className="mb-8 text-center sm:text-left">
         <h2 className="text-3xl font-playfair font-bold text-gray-900">Select Date & Time</h2>
-        <p className="text-gray-500 mt-2 font-lato">Appointment with Alex Rodriguez (60 minutes)</p>
+        <p className="text-gray-500 mt-2 font-lato">
+          Appointment with {selectedStylist ? selectedStylist.name : 'Any Stylist'} ({totalDuration} minutes)
+        </p>
       </div>
 
       {/* Layout Grid */}
@@ -84,16 +112,16 @@ export default function SelectDateTime({ onBack, onNext }: { onBack: () => void,
               
               <div className="py-1 flex items-center justify-center">
                 <button 
-                  onClick={() => setSelectedDate(1)}
-                  className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === 1 ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                  onClick={() => handleDateClick(1)}
+                  className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === getFullDateString(1) ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
                 >
                   1
                 </button>
               </div>
               <div className="py-1 flex items-center justify-center">
                 <button 
-                  onClick={() => setSelectedDate(2)}
-                  className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === 2 ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                  onClick={() => handleDateClick(2)}
+                  className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === getFullDateString(2) ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
                 >
                   2
                 </button>
@@ -101,8 +129,8 @@ export default function SelectDateTime({ onBack, onNext }: { onBack: () => void,
               {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31].map(day => (
                 <div key={day} className="py-1 flex items-center justify-center">
                   <button 
-                    onClick={() => setSelectedDate(day)}
-                    className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === day ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
+                    onClick={() => handleDateClick(day)}
+                    className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === getFullDateString(day) ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
                   >
                     {day}
                   </button>
@@ -159,7 +187,7 @@ export default function SelectDateTime({ onBack, onNext }: { onBack: () => void,
             </span>
             <div className="flex space-x-2">
               <div className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-900 font-medium font-lato">
-                May {selectedDate}, 2026
+                May {parseInt(selectedDate.split('-')[2], 10)}, 2026
               </div>
               <div className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-900 font-medium font-lato">
                 {selectedTime}

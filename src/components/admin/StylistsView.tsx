@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EditProfileButton from './EditProfileButton';
 import ManageScheduleButton from './ManageScheduleButton';
 import EditProfileModal, { Stylist } from './EditProfileModal';
 import ManageScheduleModal from './ManageScheduleModal';
+import { apiRequest } from '@/lib/api';
 
 const StarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#EAB308" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
@@ -56,13 +57,56 @@ const StylistCard = ({
 export default function StylistsView() {
   const [selectedStylist, setSelectedStylist] = useState<Stylist | null>(null);
   const [selectedStylistForSchedule, setSelectedStylistForSchedule] = useState<Stylist | null>(null);
+  const [stylists, setStylists] = useState<Stylist[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const stylists: Stylist[] = [
-    { name: "Sarah Johnson", rating: "4.9", specialties: ["Coloring", "Balayage"], initials: "SJ", colorClass: "bg-red-800" },
-    { name: "Mike Chen", rating: "4.8", specialties: ["Men's Cuts", "Fades"], initials: "MC", colorClass: "bg-blue-600" },
-    { name: "Emma Davis", rating: "5.0", specialties: ["Updos", "Bridal"], initials: "ED", colorClass: "bg-orange-400" },
-    { name: "Alex Rodriguez", rating: "4.7", specialties: ["Curly Hair", "Treatments"], initials: "AR", colorClass: "bg-indigo-600" }
-  ];
+  const getInitials = (name: string) => {
+    if (!name) return 'S';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const getColorClass = (id: number) => {
+    const classes = ['bg-red-800', 'bg-blue-600', 'bg-orange-400', 'bg-indigo-600', 'bg-purple-600', 'bg-emerald-600'];
+    return classes[id % classes.length];
+  };
+
+  useEffect(() => {
+    async function loadStylists() {
+      try {
+        const data = await apiRequest('/stylists');
+        const formatted = data.map((item: any) => ({
+          name: item.name,
+          rating: String(item.rating),
+          specialties: item.specialties || [],
+          initials: getInitials(item.name),
+          colorClass: getColorClass(item.id)
+        }));
+        setStylists(formatted);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load stylists.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStylists();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center text-gray-600 font-lato">
+        Loading stylists...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center text-red-500 font-lato">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <>

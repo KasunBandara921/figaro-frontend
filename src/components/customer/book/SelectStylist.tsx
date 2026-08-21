@@ -15,24 +15,80 @@ const ArrowLeftIcon = () => (
   </svg>
 );
 
+import { apiRequest } from '@/lib/api';
+import { useEffect } from 'react';
+
 interface Stylist {
-  id: string;
+  id: number;
   name: string;
-  rating: string;
+  rating: number;
   specialties: string[];
   initials: string;
   colorClass: string;
 }
 
-export default function SelectStylist({ onBack, onNext }: { onBack: () => void, onNext: () => void }) {
-  const [selectedStylist, setSelectedStylist] = useState<string | null>(null);
+export default function SelectStylist({ 
+  selectedStylist,
+  setSelectedStylist,
+  onBack, 
+  onNext 
+}: { 
+  selectedStylist: Stylist | null,
+  setSelectedStylist: (stylist: Stylist | null) => void,
+  onBack: () => void, 
+  onNext: () => void 
+}) {
+  const [stylists, setStylists] = useState<Stylist[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const stylists: Stylist[] = [
-    { id: "s1", name: "Sarah Johnson", rating: "4.9", specialties: ["Coloring", "Balayage"], initials: "SJ", colorClass: "bg-red-800" },
-    { id: "s2", name: "Mike Chen", rating: "4.8", specialties: ["Men's Cuts", "Fades"], initials: "MC", colorClass: "bg-blue-600" },
-    { id: "s3", name: "Emma Davis", rating: "5.0", specialties: ["Updos", "Bridal"], initials: "ED", colorClass: "bg-orange-400" },
-    { id: "s4", name: "Alex Rodriguez", rating: "4.7", specialties: ["Curly Hair", "Treatments"], initials: "AR", colorClass: "bg-indigo-600" }
-  ];
+  const getInitials = (name: string) => {
+    if (!name) return 'S';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const getColorClass = (id: number) => {
+    const classes = ['bg-red-800', 'bg-blue-600', 'bg-orange-400', 'bg-indigo-600', 'bg-purple-600', 'bg-emerald-600'];
+    return classes[id % classes.length];
+  };
+
+  useEffect(() => {
+    async function loadStylists() {
+      try {
+        const data = await apiRequest('/stylists');
+        const formatted = data.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          rating: item.rating,
+          specialties: item.specialties || [],
+          initials: getInitials(item.name),
+          colorClass: getColorClass(item.id)
+        }));
+        setStylists(formatted);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load stylists.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStylists();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 text-center text-gray-600 font-lato">
+        Loading stylists...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto py-12 text-center text-red-500 font-lato">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -54,11 +110,11 @@ export default function SelectStylist({ onBack, onNext }: { onBack: () => void, 
       {/* Stylists Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {stylists.map((stylist) => {
-          const isSelected = selectedStylist === stylist.id;
+          const isSelected = selectedStylist?.id === stylist.id;
           return (
             <div 
               key={stylist.id}
-              onClick={() => setSelectedStylist(stylist.id)}
+              onClick={() => setSelectedStylist(stylist)}
               className={`relative bg-white rounded-xl p-6 cursor-pointer transition-all border ${
                 isSelected 
                   ? 'bg-purple-50/20 border-purple-500 ring-1 ring-purple-500 shadow-md' 
@@ -73,7 +129,7 @@ export default function SelectStylist({ onBack, onNext }: { onBack: () => void, 
                   <h4 className="font-semibold text-gray-900 font-lato">{stylist.name}</h4>
                   <div className="flex items-center text-sm text-gray-600 mt-0.5 font-lato">
                     <StarIcon />
-                    <span>{stylist.rating}</span>
+                    <span>{stylist.rating} rating</span>
                   </div>
                 </div>
               </div>
