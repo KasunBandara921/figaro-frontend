@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import LayoutNav from '@/src/components/LayoutNav'
-import Footer from '@/src/components/Footer'
+import LayoutNav from '@/components/LayoutNav'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'Figaro - Premium Hair Salon',

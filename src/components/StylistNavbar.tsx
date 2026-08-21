@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-export default function CustomerNavbar() {
+export default function StylistNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export default function CustomerNavbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/stylist" className="flex-shrink-0">
             <Image 
               src="/images/5bcdac3e39ce885ebea26893_figaro LOGO_white.svg"
               alt="Figaro Logo"
@@ -34,11 +34,8 @@ export default function CustomerNavbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8 items-center">
-            <Link href="/" className="hover:text-yellow-400 transition-colors">Home</Link>
-            <Link href="/#services" className="hover:text-yellow-400 transition-colors">Services</Link>
-            <Link href="/customer/book" className="hover:text-yellow-400 transition-colors">Book</Link>
-            <Link href="/customer/appointments" className="hover:text-yellow-400 transition-colors">My Appointments</Link>
-            <Link href="/customer/profile" className="hover:text-yellow-400 transition-colors">Profile</Link>
+            <span className="text-gray-400 text-xs uppercase tracking-widest border-r border-gray-700 pr-4">Stylist Portal</span>
+            <Link href="/stylist" className="hover:text-yellow-400 transition-colors">My Schedule</Link>
             <a 
               href="#" 
               onClick={handleLogout} 
@@ -51,7 +48,7 @@ export default function CustomerNavbar() {
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2"
+            className="md:hidden p-2 text-gray-400 hover:text-white"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -62,15 +59,12 @@ export default function CustomerNavbar() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2">
-            <Link href="/" className="block py-2 hover:text-yellow-400 transition-colors">Home</Link>
-            <Link href="/#services" className="block py-2 hover:text-yellow-400 transition-colors">Services</Link>
-            <Link href="/customer/book" className="block py-2 hover:text-yellow-400 transition-colors">Book</Link>
-            <Link href="/customer/appointments" className="block py-2 hover:text-yellow-400 transition-colors">My Appointments</Link>
-            <Link href="/customer/profile" className="block py-2 hover:text-yellow-400 transition-colors">Profile</Link>
+            <div className="px-3 py-2 text-xs uppercase tracking-widest text-gray-500">Stylist Portal</div>
+            <Link href="/stylist" className="block px-3 py-2 hover:text-yellow-400 transition-colors">My Schedule</Link>
             <a 
               href="#" 
               onClick={handleLogout} 
-              className="block py-2 hover:text-yellow-400 transition-colors font-semibold"
+              className="block px-3 py-2 hover:text-yellow-400 transition-colors font-semibold"
             >
               Logout
             </a>

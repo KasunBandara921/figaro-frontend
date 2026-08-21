@@ -1,4 +1,4 @@
-import BookingFlow from "@/src/components/customer/book/BookingFlow";
+import BookingFlow from "@/components/customer/book/BookingFlow";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

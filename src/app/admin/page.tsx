@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import CalendarView from '@/src/components/admin/CalendarView';
-import StylistsView from '@/src/components/admin/StylistsView';
+import CalendarView from '@/components/admin/CalendarView';
+import StylistsView from '@/components/admin/StylistsView';
 
 // Simple SVG Icons
 const CalendarIcon = () => (
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50/50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* Header */}
         <div>
           <h1 className="text-3xl md:text-4xl font-playfair font-bold text-gray-900">Admin Dashboard</h1>
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
         {/* Top Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <span className="text-sm font-semibold text-gray-800">Total Bookings</span>
@@ -108,19 +108,19 @@ export default function AdminDashboard() {
 
         {/* Navigation Tabs */}
         <div className="flex space-x-2">
-          <button 
+          <button
             onClick={() => setActiveTab('bookings')}
             className={`px-5 py-2 rounded-full text-sm transition-colors border ${activeTab === 'bookings' ? 'bg-white border-gray-200 text-gray-900 font-semibold shadow-sm' : 'bg-transparent border-transparent text-gray-600 font-medium hover:bg-gray-100'}`}
           >
             Bookings
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('calendar')}
             className={`px-5 py-2 rounded-full text-sm transition-colors border ${activeTab === 'calendar' ? 'bg-white border-gray-200 text-gray-900 font-semibold shadow-sm' : 'bg-transparent border-transparent text-gray-600 font-medium hover:bg-gray-100'}`}
           >
             Calendar
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('stylists')}
             className={`px-5 py-2 rounded-full text-sm transition-colors border ${activeTab === 'stylists' ? 'bg-white border-gray-200 text-gray-900 font-semibold shadow-sm' : 'bg-transparent border-transparent text-gray-600 font-medium hover:bg-gray-100'}`}
           >
