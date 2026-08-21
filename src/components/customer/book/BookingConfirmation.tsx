@@ -76,9 +76,19 @@ export default function BookingConfirmation({
 
   const getDisplayDate = () => {
     if (!selectedDate) return '';
-    const parts = selectedDate.split('-');
-    const day = parseInt(parts[2], 10);
-    return `May ${day}, 2026`;
+    try {
+      const parts = selectedDate.split('-');
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      return `${monthNames[monthIdx]} ${day}, ${year}`;
+    } catch {
+      return selectedDate;
+    }
   };
 
   return (
