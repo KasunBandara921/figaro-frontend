@@ -32,6 +32,7 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token)
       localStorage.setItem('role', data.role)
       localStorage.setItem('fullName', data.fullName)
+      localStorage.setItem('email', data.email)
 
       if (data.role === 'ADMIN') {
         router.push('/admin')

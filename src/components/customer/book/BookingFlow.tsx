@@ -26,11 +26,15 @@ export default function BookingFlow() {
   const [selectedStylist, setSelectedStylist] = useState<any | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
-  const [customerDetails, setCustomerDetails] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    specialRequests: ''
+  const [customerDetails, setCustomerDetails] = useState(() => {
+    const defaultName = typeof window !== 'undefined' ? localStorage.getItem('fullName') || '' : '';
+    const defaultEmail = typeof window !== 'undefined' ? localStorage.getItem('email') || '' : '';
+    return {
+      fullName: defaultName,
+      email: defaultEmail,
+      phone: '',
+      specialRequests: ''
+    };
   });
   const [bookingReference, setBookingReference] = useState<string>('');
 
