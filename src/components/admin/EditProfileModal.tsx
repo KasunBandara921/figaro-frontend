@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { apiRequest } from '@/lib/api';
 
 export interface Stylist {
+  id: number;
   name: string;
   rating: string;
   specialties: string[];
@@ -10,15 +12,19 @@ export interface Stylist {
 
 export default function EditProfileModal({ 
   stylist, 
-  onClose 
+  onClose,
+  onSaveSuccess
 }: { 
   stylist: Stylist; 
   onClose: () => void;
+  onSaveSuccess?: () => void;
 }) {
   const [name, setName] = useState(stylist.name);
   const [rating] = useState(stylist.rating);
   const [specialties, setSpecialties] = useState<string[]>([...stylist.specialties]);
   const [newSpecialty, setNewSpecialty] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleAddSpecialty = () => {
     if (newSpecialty.trim()) {
@@ -29,6 +35,29 @@ export default function EditProfileModal({
 
   const handleRemoveSpecialty = (specToRemove: string) => {
     setSpecialties(specialties.filter(s => s !== specToRemove));
+  };
+
+  const handleSave = async () => {
+    setSubmitting(true);
+    setError('');
+    try {
+      await apiRequest(`/admin/stylists/${stylist.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          name: name,
+          specialties: specialties,
+          rating: parseFloat(rating)
+        })
+      });
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save stylist changes.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -100,19 +129,26 @@ export default function EditProfileModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-2 pb-6 flex justify-end space-x-3 border-t border-transparent">
-          <button 
-            onClick={onClose}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors font-lato"
-          >
-            Cancel
-          </button>
-          <button 
-            onClick={onClose}
-            className="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors font-lato"
-          >
-            Save Changes
-          </button>
+        <div className="p-6 pt-2 pb-6 flex flex-col items-stretch border-t border-transparent space-y-3">
+          {error && (
+            <p className="text-red-500 text-sm font-lato mb-2 text-center">{error}</p>
+          )}
+          <div className="flex justify-end space-x-3">
+            <button 
+              disabled={submitting}
+              onClick={onClose}
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors font-lato disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button 
+              disabled={submitting}
+              onClick={handleSave}
+              className="px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors font-lato disabled:opacity-50"
+            >
+              {submitting ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

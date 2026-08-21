@@ -52,22 +52,37 @@ export default function AdminDashboard() {
   const [stylistsCount, setStylistsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeDropdownId, setActiveDropdownId] = useState<number | null>(null);
+
+  const loadDashboardData = async () => {
+    try {
+      const appointmentData = await apiRequest('/appointments');
+      const stylistData = await apiRequest('/stylists');
+      setAppointments(appointmentData || []);
+      setStylistsCount(stylistData ? stylistData.length : 0);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load dashboard metrics. Access denied.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadDashboardData() {
-      try {
-        const appointmentData = await apiRequest('/appointments');
-        const stylistData = await apiRequest('/stylists');
-        setAppointments(appointmentData || []);
-        setStylistsCount(stylistData ? stylistData.length : 0);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load dashboard metrics. Access denied.');
-      } finally {
-        setLoading(false);
-      }
-    }
     loadDashboardData();
   }, []);
+
+  const handleStatusUpdate = async (id: number, status: string) => {
+    try {
+      await apiRequest(`/appointments/${id}/status?status=${status}`, {
+        method: 'PUT'
+      });
+      await loadDashboardData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to update status.');
+    } finally {
+      setActiveDropdownId(null);
+    }
+  };
 
   const totalBookings = appointments.length;
   const activeBookings = appointments.filter(a => a.status === 'CONFIRMED' || a.status === 'PENDING').length;
@@ -273,8 +288,48 @@ export default function AdminDashboard() {
                             {appointment.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <MoreVerticalIcon />
+                        <td className="px-6 py-4 text-right relative">
+                          <button
+                            onClick={() => setActiveDropdownId(activeDropdownId === appointment.id ? null : appointment.id)}
+                            className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+                          >
+                            <MoreVerticalIcon />
+                          </button>
+                          
+                          {activeDropdownId === appointment.id && (
+                            <div className="absolute right-6 mt-1 w-44 bg-white rounded-lg border border-gray-100 shadow-lg py-1 z-50 text-left">
+                              {appointment.status === 'PENDING' && (
+                                <button
+                                  onClick={() => handleStatusUpdate(appointment.id, 'CONFIRMED')}
+                                  className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center font-medium font-lato"
+                                >
+                                  Confirm Booking
+                                </button>
+                              )}
+                              {appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+                                <>
+                                  <button
+                                    onClick={() => handleStatusUpdate(appointment.id, 'COMPLETED')}
+                                    className="w-full px-4 py-2 text-sm text-green-600 hover:bg-gray-50 flex items-center font-medium font-lato"
+                                  >
+                                    Mark Completed
+                                  </button>
+                                  <button
+                                    onClick={() => handleStatusUpdate(appointment.id, 'CANCELLED')}
+                                    className="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center font-medium font-lato"
+                                  >
+                                    Cancel Appointment
+                                  </button>
+                                </>
+                              )}
+                              {appointment.status === 'CANCELLED' && (
+                                <p className="px-4 py-2 text-xs text-gray-400 font-lato">No actions available</p>
+                              )}
+                              {appointment.status === 'COMPLETED' && (
+                                <p className="px-4 py-2 text-xs text-gray-400 font-lato">No actions available</p>
+                              )}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))

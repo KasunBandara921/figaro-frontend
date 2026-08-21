@@ -71,24 +71,26 @@ export default function StylistsView() {
     return classes[id % classes.length];
   };
 
-  useEffect(() => {
-    async function loadStylists() {
-      try {
-        const data = await apiRequest('/stylists');
-        const formatted = data.map((item: any) => ({
-          name: item.name,
-          rating: String(item.rating),
-          specialties: item.specialties || [],
-          initials: getInitials(item.name),
-          colorClass: getColorClass(item.id)
-        }));
-        setStylists(formatted);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load stylists.');
-      } finally {
-        setLoading(false);
-      }
+  const loadStylists = async () => {
+    try {
+      const data = await apiRequest('/stylists');
+      const formatted = data.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        rating: String(item.rating),
+        specialties: item.specialties || [],
+        initials: getInitials(item.name),
+        colorClass: getColorClass(item.id)
+      }));
+      setStylists(formatted);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load stylists.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadStylists();
   }, []);
 
@@ -135,6 +137,7 @@ export default function StylistsView() {
         <EditProfileModal 
           stylist={selectedStylist} 
           onClose={() => setSelectedStylist(null)} 
+          onSaveSuccess={loadStylists}
         />
       )}
 
