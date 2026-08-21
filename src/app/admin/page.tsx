@@ -50,15 +50,18 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('bookings');
   const [appointments, setAppointments] = useState<any[]>([]);
   const [stylistsCount, setStylistsCount] = useState(0);
+  const [stylists, setStylists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeDropdownId, setActiveDropdownId] = useState<number | null>(null);
+  const [activeAssignId, setActiveAssignId] = useState<number | null>(null);
 
   const loadDashboardData = async () => {
     try {
       const appointmentData = await apiRequest('/appointments');
       const stylistData = await apiRequest('/stylists');
       setAppointments(appointmentData || []);
+      setStylists(stylistData || []);
       setStylistsCount(stylistData ? stylistData.length : 0);
     } catch (err: any) {
       setError(err.message || 'Failed to load dashboard metrics. Access denied.');
@@ -81,6 +84,19 @@ export default function AdminDashboard() {
       alert(err.message || 'Failed to update status.');
     } finally {
       setActiveDropdownId(null);
+    }
+  };
+
+  const handleAssignStylist = async (appointmentId: number, stylistId: number) => {
+    try {
+      await apiRequest(`/appointments/${appointmentId}/assign?stylistId=${stylistId}`, {
+        method: 'PUT'
+      });
+      await loadDashboardData();
+    } catch (err: any) {
+      alert(err.message || 'Failed to assign stylist.');
+    } finally {
+      setActiveAssignId(null);
     }
   };
 
@@ -309,6 +325,15 @@ export default function AdminDashboard() {
                               {appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
                                 <>
                                   <button
+                                    onClick={() => {
+                                      setActiveAssignId(appointment.id);
+                                      setActiveDropdownId(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center font-medium font-lato border-b border-gray-50"
+                                  >
+                                    Assign Stylist
+                                  </button>
+                                  <button
                                     onClick={() => handleStatusUpdate(appointment.id, 'COMPLETED')}
                                     className="w-full px-4 py-2 text-sm text-green-600 hover:bg-gray-50 flex items-center font-medium font-lato"
                                   >
@@ -347,6 +372,41 @@ export default function AdminDashboard() {
         {activeTab === 'stylists' && <StylistsView />}
 
       </div>
+
+      {/* Assign Stylist Modal */}
+      {activeAssignId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 overflow-hidden border border-gray-100">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="font-bold text-gray-950 font-lato text-base">Assign Stylist</h3>
+              <button 
+                onClick={() => setActiveAssignId(null)} 
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div className="p-5 max-h-64 overflow-y-auto space-y-2">
+              {stylists.length === 0 ? (
+                <p className="text-gray-400 text-sm font-lato text-center py-4">No stylists found</p>
+              ) : (
+                stylists.map((st: any) => (
+                  <button
+                    key={st.id}
+                    onClick={() => handleAssignStylist(activeAssignId, st.id)}
+                    className="w-full text-left px-4 py-3 border border-gray-100 rounded-lg hover:bg-gray-50 hover:border-gray-300 font-lato font-medium text-sm flex items-center justify-between transition-colors shadow-sm bg-white"
+                  >
+                    <span className="text-gray-900 font-lato">{st.name}</span>
+                    <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 font-semibold font-lato">
+                      {st.specialties?.slice(0,1).join('') || 'Stylist'}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
