@@ -113,6 +113,8 @@ export default function SelectDateTime({
     }
   };
 
+  const isPrevDisabled = currentYear <= today.getFullYear() && currentMonth <= today.getMonth();
+
   const getDisplayDate = () => {
     if (!selectedDate) return '';
     try {
@@ -154,7 +156,11 @@ export default function SelectDateTime({
           
           <div className="border border-gray-100 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
-              <button onClick={handlePrevMonth} className="p-1.5 hover:bg-gray-50 rounded-md text-gray-400 transition-colors">
+              <button 
+                disabled={isPrevDisabled}
+                onClick={handlePrevMonth} 
+                className={`p-1.5 rounded-md transition-colors ${isPrevDisabled ? 'text-gray-200 cursor-not-allowed opacity-40' : 'hover:bg-gray-50 text-gray-400'}`}
+              >
                 <ChevronLeftIcon />
               </button>
               <h5 className="font-semibold text-gray-900 font-lato text-sm">{monthNames[currentMonth]} {currentYear}</h5>
@@ -172,16 +178,30 @@ export default function SelectDateTime({
                 <div key={`p${idx}`} className="py-1 text-sm text-gray-300 font-lato">{day}</div>
               ))}
               
-              {currentDays.map(day => (
-                <div key={day} className="py-1 flex items-center justify-center">
-                  <button 
-                    onClick={() => handleDateClick(day)}
-                    className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === getFullDateString(day) ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                  >
-                    {day}
-                  </button>
-                </div>
-              ))}
+              {currentDays.map(day => {
+                const cellDate = new Date(currentYear, currentMonth, day);
+                const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                const isPast = cellDate < todayDate;
+                const isSelected = selectedDate === getFullDateString(day);
+
+                return (
+                  <div key={day} className="py-1 flex items-center justify-center">
+                    <button 
+                      disabled={isPast}
+                      onClick={() => handleDateClick(day)}
+                      className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${
+                        isSelected 
+                          ? 'bg-black text-white' 
+                          : isPast 
+                            ? 'text-gray-300 cursor-not-allowed opacity-50' 
+                            : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {day}
+                    </button>
+                  </div>
+                );
+              })}
               
               {nextPadding.map((day, idx) => (
                 <div key={`n${idx}`} className="py-1 text-sm text-gray-300 font-lato">{day}</div>
