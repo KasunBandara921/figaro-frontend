@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import EditProfileButton from './EditProfileButton';
 import EditProfileModal, { Stylist } from './EditProfileModal';
+import AddStylistModal from './AddStylistModal';
 import { apiRequest } from '@/lib/api';
 
 const StarIcon = () => (
@@ -164,6 +165,7 @@ const StylistAppointmentsModal = ({
 export default function StylistsView() {
   const [selectedStylist, setSelectedStylist] = useState<Stylist | null>(null);
   const [selectedStylistForAppointments, setSelectedStylistForAppointments] = useState<Stylist | null>(null);
+  const [isAddingStylist, setIsAddingStylist] = useState(false);
   const [stylists, setStylists] = useState<Stylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -220,9 +222,21 @@ export default function StylistsView() {
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6 relative">
-        <div className="p-6 pb-6 border-b border-gray-100">
-          <h3 className="text-xl font-playfair font-bold text-gray-900">Stylist Management</h3>
-          <p className="text-sm text-gray-500 mt-1">Manage stylist profiles and availability</p>
+        <div className="p-6 pb-6 border-b border-gray-100 flex justify-between items-center">
+          <div>
+            <h3 className="text-xl font-playfair font-bold text-gray-900">Stylist Management</h3>
+            <p className="text-sm text-gray-500 mt-1">Manage stylist profiles and availability</p>
+          </div>
+          <button 
+            onClick={() => setIsAddingStylist(true)}
+            className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg text-sm font-semibold transition-all font-lato flex items-center shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Stylist
+          </button>
         </div>
         
         <div className="p-6 bg-gray-50/30">
@@ -240,6 +254,13 @@ export default function StylistsView() {
       </div>
 
       {/* Render the Modals */}
+      {isAddingStylist && (
+        <AddStylistModal 
+          onClose={() => setIsAddingStylist(false)} 
+          onSaveSuccess={loadStylists}
+        />
+      )}
+
       {selectedStylist && (
         <EditProfileModal 
           stylist={selectedStylist} 
