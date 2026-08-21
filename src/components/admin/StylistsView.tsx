@@ -21,14 +21,35 @@ const ViewAppointmentsButton = ({ onClick }: { onClick: () => void }) => (
   </button>
 );
 
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+
+const DeleteStylistButton = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-lg text-sm font-medium transition-colors flex items-center justify-center"
+    title="Delete Stylist"
+  >
+    <TrashIcon />
+  </button>
+);
+
 const StylistCard = ({ 
   stylist, 
   onEditClick,
-  onAppointmentsClick
+  onAppointmentsClick,
+  onDeleteClick
 }: { 
   stylist: Stylist, 
   onEditClick: () => void,
-  onAppointmentsClick: () => void
+  onAppointmentsClick: () => void,
+  onDeleteClick: () => void
 }) => (
   <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
     <div className="flex items-center space-x-4 mb-6">
@@ -58,6 +79,7 @@ const StylistCard = ({
     <div className="flex gap-3 pt-4 border-t border-gray-50">
       <EditProfileButton onClick={onEditClick} />
       <ViewAppointmentsButton onClick={onAppointmentsClick} />
+      <DeleteStylistButton onClick={onDeleteClick} />
     </div>
   </div>
 );
@@ -199,6 +221,19 @@ export default function StylistsView() {
     }
   };
 
+  const handleDeleteStylist = async (id: number, name: string) => {
+    if (window.confirm(`Are you sure you want to delete ${name}? This will also remove them from all assigned appointments.`)) {
+      try {
+        await apiRequest(`/admin/stylists/${id}`, {
+          method: 'DELETE'
+        });
+        await loadStylists();
+      } catch (err: any) {
+        alert(err.message || 'Failed to delete stylist.');
+      }
+    }
+  };
+
   useEffect(() => {
     loadStylists();
   }, []);
@@ -247,6 +282,7 @@ export default function StylistsView() {
                 stylist={stylist} 
                 onEditClick={() => setSelectedStylist(stylist)} 
                 onAppointmentsClick={() => setSelectedStylistForAppointments(stylist)}
+                onDeleteClick={() => handleDeleteStylist(stylist.id, stylist.name)}
               />
             ))}
           </div>
