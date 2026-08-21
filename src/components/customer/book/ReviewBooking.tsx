@@ -73,27 +73,13 @@ export default function ReviewBooking({
   onBack: () => void, 
   onNext: () => void 
 }) {
-  const [promoCode, setPromoCode] = React.useState('');
-  const [promoApplied, setPromoApplied] = React.useState(false);
-  const [promoError, setPromoError] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState('');
 
   const subtotal = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
-  const discount = promoApplied ? subtotal * 0.1 : 0;
-  const total = subtotal - discount;
+  const total = subtotal;
 
   const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
-
-  const handleApplyPromo = () => {
-    if (promoCode === 'ELITE10') {
-      setPromoApplied(true);
-      setPromoError(false);
-    } else {
-      setPromoApplied(false);
-      setPromoError(true);
-    }
-  };
 
   const handleConfirmBooking = async () => {
     setSubmitting(true);
@@ -220,45 +206,11 @@ export default function ReviewBooking({
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h3 className="font-semibold text-gray-900 mb-6 font-lato text-lg">Payment Summary</h3>
           
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-900 mb-2 font-lato">Promo Code</label>
-            <div className="flex gap-3">
-              <input 
-                type="text" 
-                value={promoCode}
-                onChange={(e) => {
-                  setPromoCode(e.target.value);
-                  setPromoError(false);
-                }}
-                placeholder="Enter code (try ELITE10)"
-                className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 font-lato transition-all"
-              />
-              <button 
-                onClick={handleApplyPromo}
-                className="px-6 py-2.5 bg-white border border-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors font-lato text-sm shadow-sm"
-              >
-                Apply
-              </button>
-            </div>
-            {promoError && (
-              <p className="text-red-500 text-sm font-lato mt-2">Invalid promo code</p>
-            )}
-            {promoApplied && (
-              <p className="text-green-600 text-sm font-lato mt-2">10% discount applied!</p>
-            )}
-          </div>
-
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center text-sm font-lato">
               <span className="text-gray-600">Subtotal</span>
               <span className="text-gray-900 font-medium">${subtotal.toFixed(2)}</span>
             </div>
-            {promoApplied && (
-              <div className="flex justify-between items-center text-sm font-lato text-green-600">
-                <span>Discount (10%)</span>
-                <span>-${discount.toFixed(2)}</span>
-              </div>
-            )}
             <div className="flex justify-between items-center pt-3 border-t border-gray-100">
               <span className="text-gray-900 font-semibold font-lato">Total</span>
               <span className="text-gray-900 font-bold text-lg font-lato">${total.toFixed(2)}</span>
