@@ -47,21 +47,83 @@ export default function SelectDateTime({
   onBack: () => void, 
   onNext: () => void 
 }) {
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+
   const availableTimes = [
     "09:00", "10:00", "11:00",
     "12:00", "14:00", "15:00",
     "16:00", "17:00"
   ];
 
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+  const prevPadding: number[] = [];
+  for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+    prevPadding.push(daysInPrevMonth - i);
+  }
+
+  const currentDays: number[] = [];
+  for (let i = 1; i <= daysInMonth; i++) {
+    currentDays.push(i);
+  }
+
+  const totalCells = prevPadding.length + currentDays.length;
+  const nextPadding: number[] = [];
+  const remaining = 42 - totalCells;
+  for (let i = 1; i <= remaining; i++) {
+    nextPadding.push(i);
+  }
+
   const totalDuration = selectedServices.reduce((acc, curr) => acc + curr.duration, 0);
 
   const getFullDateString = (day: number) => {
-    const formattedDay = day < 10 ? `0${day}` : day;
-    return `2026-05-${formattedDay}`;
+    const formattedMonth = String(currentMonth + 1).padStart(2, '0');
+    const formattedDay = String(day).padStart(2, '0');
+    return `${currentYear}-${formattedMonth}-${formattedDay}`;
   };
 
   const handleDateClick = (day: number) => {
     setSelectedDate(getFullDateString(day));
+  };
+
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear(prev => prev - 1);
+    } else {
+      setCurrentMonth(prev => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear(prev => prev + 1);
+    } else {
+      setCurrentMonth(prev => prev + 1);
+    }
+  };
+
+  const getDisplayDate = () => {
+    if (!selectedDate) return '';
+    try {
+      const parts = selectedDate.split('-');
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      return `${monthNames[monthIdx]} ${day}, ${year}`;
+    } catch {
+      return selectedDate;
+    }
   };
 
   return (
@@ -92,11 +154,11 @@ export default function SelectDateTime({
           
           <div className="border border-gray-100 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
-              <button className="p-1.5 hover:bg-gray-50 rounded-md text-gray-400 transition-colors">
+              <button onClick={handlePrevMonth} className="p-1.5 hover:bg-gray-50 rounded-md text-gray-400 transition-colors">
                 <ChevronLeftIcon />
               </button>
-              <h5 className="font-semibold text-gray-900 font-lato text-sm">May 2026</h5>
-              <button className="p-1.5 hover:bg-gray-50 rounded-md text-gray-400 transition-colors">
+              <h5 className="font-semibold text-gray-900 font-lato text-sm">{monthNames[currentMonth]} {currentYear}</h5>
+              <button onClick={handleNextMonth} className="p-1.5 hover:bg-gray-50 rounded-md text-gray-400 transition-colors">
                 <ChevronRightIcon />
               </button>
             </div>
@@ -106,27 +168,11 @@ export default function SelectDateTime({
                 <div key={day} className="text-xs font-medium text-gray-400 mb-2">{day}</div>
               ))}
               
-              {[26, 27, 28, 29, 30].map(day => (
-                <div key={`p${day}`} className="py-1 text-sm text-gray-300 font-lato">{day}</div>
+              {prevPadding.map((day, idx) => (
+                <div key={`p${idx}`} className="py-1 text-sm text-gray-300 font-lato">{day}</div>
               ))}
               
-              <div className="py-1 flex items-center justify-center">
-                <button 
-                  onClick={() => handleDateClick(1)}
-                  className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === getFullDateString(1) ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                >
-                  1
-                </button>
-              </div>
-              <div className="py-1 flex items-center justify-center">
-                <button 
-                  onClick={() => handleDateClick(2)}
-                  className={`w-8 h-8 rounded-full text-sm flex items-center justify-center font-medium transition-colors ${selectedDate === getFullDateString(2) ? 'bg-black text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                >
-                  2
-                </button>
-              </div>
-              {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31].map(day => (
+              {currentDays.map(day => (
                 <div key={day} className="py-1 flex items-center justify-center">
                   <button 
                     onClick={() => handleDateClick(day)}
@@ -137,8 +183,8 @@ export default function SelectDateTime({
                 </div>
               ))}
               
-              {[1, 2, 3, 4, 5, 6].map(day => (
-                <div key={`n${day}`} className="py-1 text-sm text-gray-300 font-lato">{day}</div>
+              {nextPadding.map((day, idx) => (
+                <div key={`n${idx}`} className="py-1 text-sm text-gray-300 font-lato">{day}</div>
               ))}
             </div>
           </div>
@@ -187,7 +233,7 @@ export default function SelectDateTime({
             </span>
             <div className="flex space-x-2">
               <div className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-900 font-medium font-lato">
-                May {parseInt(selectedDate.split('-')[2], 10)}, 2026
+                {getDisplayDate()}
               </div>
               <div className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-900 font-medium font-lato">
                 {selectedTime}
