@@ -11,12 +11,23 @@ const StarIcon = () => (
   </svg>
 );
 
+const ViewAppointmentsButton = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all font-lato text-center"
+  >
+    View Appointments
+  </button>
+);
+
 const StylistCard = ({ 
   stylist, 
-  onEditClick
+  onEditClick,
+  onAppointmentsClick
 }: { 
   stylist: Stylist, 
-  onEditClick: () => void
+  onEditClick: () => void,
+  onAppointmentsClick: () => void
 }) => (
   <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow">
     <div className="flex items-center space-x-4 mb-6">
@@ -43,14 +54,116 @@ const StylistCard = ({
       </div>
     </div>
     
-    <div className="pt-4 border-t border-gray-50">
+    <div className="flex gap-3 pt-4 border-t border-gray-50">
       <EditProfileButton onClick={onEditClick} />
+      <ViewAppointmentsButton onClick={onAppointmentsClick} />
     </div>
   </div>
 );
 
+const StylistAppointmentsModal = ({ 
+  stylist, 
+  onClose 
+}: { 
+  stylist: Stylist, 
+  onClose: () => void 
+}) => {
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const data = await apiRequest(`/appointments/stylist/${encodeURIComponent(stylist.name)}`);
+        setAppointments(data || []);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch appointments.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
+  }, [stylist]);
+
+  const getDisplayDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const parts = dateStr.split('-');
+      const year = parts[0];
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${months[monthIdx]} ${day}, ${year}`;
+    } catch {
+      return dateStr;
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden border border-gray-100 flex flex-col max-h-[80vh] text-left">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center p-5 border-b border-gray-100">
+          <div>
+            <h3 className="font-bold text-gray-900 font-playfair text-lg">Appointments: {stylist.name}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Assigned schedules from database</p>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-5 overflow-y-auto flex-1 space-y-3 min-h-[200px]">
+          {loading ? (
+            <p className="text-gray-500 text-sm font-lato text-center py-8">Loading schedule details...</p>
+          ) : error ? (
+            <p className="text-red-500 text-sm font-lato text-center py-8">{error}</p>
+          ) : appointments.length === 0 ? (
+            <p className="text-gray-400 text-sm font-lato text-center py-8">No appointments scheduled for this stylist.</p>
+          ) : (
+            appointments.map((app) => (
+              <div key={app.id} className="p-4 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors bg-gray-50/30">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-sm font-playfair">{app.customerName}</h4>
+                    <p className="text-xs text-gray-500 font-lato mt-0.5">{app.customerPhone}</p>
+                  </div>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase ${
+                    app.status === 'COMPLETED' ? 'bg-green-500 text-white' :
+                    app.status === 'CANCELLED' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+                  }`}>
+                    {app.status}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-100 text-xs font-lato text-gray-600">
+                  <div>
+                    <span className="font-semibold text-gray-900">Service:</span> {app.service ? app.service.name : 'N/A'}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900">Price:</span> {app.service ? `$${app.service.price.toFixed(2)}` : '$0.00'}
+                  </div>
+                  <div className="col-span-2">
+                    <span className="font-semibold text-gray-900">Schedule:</span> {getDisplayDate(app.appointmentDate)} at {app.appointmentTime}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function StylistsView() {
   const [selectedStylist, setSelectedStylist] = useState<Stylist | null>(null);
+  const [selectedStylistForAppointments, setSelectedStylistForAppointments] = useState<Stylist | null>(null);
   const [stylists, setStylists] = useState<Stylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -119,6 +232,7 @@ export default function StylistsView() {
                 key={stylist.name} 
                 stylist={stylist} 
                 onEditClick={() => setSelectedStylist(stylist)} 
+                onAppointmentsClick={() => setSelectedStylistForAppointments(stylist)}
               />
             ))}
           </div>
@@ -134,6 +248,12 @@ export default function StylistsView() {
         />
       )}
 
+      {selectedStylistForAppointments && (
+        <StylistAppointmentsModal 
+          stylist={selectedStylistForAppointments} 
+          onClose={() => setSelectedStylistForAppointments(null)} 
+        />
+      )}
     </>
   );
 }
