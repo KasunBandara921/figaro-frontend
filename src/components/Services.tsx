@@ -4,39 +4,42 @@ export default function Services() {
       id: 'hair-styling',
       title: 'haiR styling',
       iconSrc: '/images/5bcdac071fb209989bc6a0ef_boy-hair-shape.svg',
+      description: 'Custom styling for special events, daily refinement, or editorial shoots. We sculpt, blow-out, and set your hair to match your personal style.',
     },
     {
       id: 'scalp-massage',
       title: 'scalp massage',
       iconSrc: '/images/5bcf4b86dba98ddefb93e09e_hand0.svg',
+      description: 'A relaxing and rejuvenating treatment that stimulates scalp circulation, relieves muscle tension, and promotes healthy hair growth.',
     },
     {
       id: 'edge-up',
       title: 'edge up',
       iconSrc: '/images/5bcdac07d44cf416ba71788e_hairdryer-silhouette-side-view.svg',
+      description: 'A precise clean-up of your hairline, sideburns, and neckline to keep your haircut looking sharp and fresh between major visits.',
     },
     {
       id: 'hair-cut',
       title: 'HAIR CUT',
       iconSrc: '/images/5bcdac070508efc0577c7d76_chair-side-view-silhouette.svg',
+      description: 'A premium, tailored cut designed specifically to complement your unique facial structure, hair type, and individual personality.',
     },
     {
       id: 'beard-trim',
       title: 'beard trim',
       iconSrc: '/images/5bcdac0739ce880525a2679c_razor-hair-salon-tool.svg',
+      description: 'Expert trimming, shaping, and precision detailing of your facial hair, finished with premium oils to keep your beard healthy and groomed.',
     },
     {
       id: 'coloring',
       title: 'COLORING',
       iconSrc: '/images/5bcdac0779f044bab2c9bea9_hair-salon-spray-bottle-and-can.svg',
+      description: 'Professional coloring solutions ranging from subtle natural blending and grey coverage to vibrant highlights and full transformations.',
     },
   ] as const
 
-  const description =
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-
   const priceParagraph =
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+    'We invite you to experience our exclusive weekly offers. Whether you visit us during the early week or for a weekend refresh, we have tailored pricing and packages designed to keep you looking sharp.'
 
   const whiteOffer = [
     { label: 'Male cut', price: '$18' },
@@ -69,7 +72,7 @@ export default function Services() {
               {service.title}
             </h3>
             <p className="mt-3 font-playfair text-[16px] leading-[30px] text-neutral-500 max-w-[700px]">
-              {description}
+              {service.description}
             </p>
           </div>
         ))}
