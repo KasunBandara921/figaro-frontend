@@ -23,37 +23,6 @@ export default function Hero() {
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10 min-h-[calc(100vh-5rem)] grid grid-cols-12 grid-rows-[1fr_auto] gap-x-10 py-12">
         {/* Left black banner (services) */}
         <div className="hidden md:block col-span-12 md:col-span-3 row-start-1 self-start">
-          <div className="bg-black/60 backdrop-blur-sm px-10 py-10 w-[280px]">
-            <Image
-              src="/images/5bcdd74876071d68f0138256_5.svg"
-              alt=""
-              width={50}
-              height={50}
-              className="mb-4"
-            />
-            <div className="font-playfair text-lg mb-3">Hair Styling</div>
-            <div className="text-sm text-white/70 space-y-1">
-              <div>Haircut</div>
-              <div>Hair coloring</div>
-              <div>Highlights</div>
-            </div>
-
-            <div className="mt-10" />
-
-            <Image
-              src="/images/5bcdd7489f4e0e4a256dca46_4.svg"
-              alt=""
-              width={50}
-              height={50}
-              className="mb-4"
-            />
-            <div className="font-playfair text-lg mb-3">Beard Styling</div>
-            <div className="text-sm text-white/70 space-y-1">
-              <div>Beard coloring</div>
-              <div>Shave</div>
-              <div>Beard trim</div>
-            </div>
-          </div>
         </div>
 
         {/* Center play button */}
