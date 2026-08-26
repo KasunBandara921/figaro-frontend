@@ -10,24 +10,12 @@ export default function About() {
           <h2 className="font-playfair text-[45px] leading-[65px] font-normal text-[#333] mb-8">About us</h2>
 
           <p className="font-playfair text-[22px] leading-[38px] text-[#333] mb-0">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Risus pretium quam vulputate dignissim suspendisse in est ante.{' '}
-            <em className="italic">Amet venenatis urna cursus eget nunc scelerisque viverra.</em> Auctor neque vitae tempus quam pellentesque nec nam. Lacus vestibulum sed arcu non odio euismod. Aliquam etiam erat velit.
+            At Figaro, we believe grooming is an art form. Established with a passion for precision and a commitment to style, our salon is a sanctuary where modern techniques meet classic sophistication. Our team of dedicated master stylists is committed to crafting personalized experiences that enhance your natural character and style.
           </p>
 
           <p className="mt-5 font-playfair text-[22px] leading-[38px] text-[#333]">
-            <span>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore{' '}
-            </span>
-            <span className="underline underline-offset-4 decoration-black/60">et dolore magna aliqua.</span>
-            <span>
-              {' '}
-              Risus pretium quam vulputate dignissim suspendisse in est ante. Amet venenatis urna cursus eget nunc scelerisque viverra.{' '}
-            </span>
-            <strong className="font-bold">Auctor neque vitae tempus quam pellentesque nec nam.</strong>
-            <span>
-              {' '}
-              Lacus vestibulum sed arcu non odio euismod. Aliquam etiam erat velit scelerisque in. Dignissim sodales ut eu sem integer vitae justo eget magna.
-            </span>
+            From precision haircuts and tailored styling to rich color transformations and signature beard grooming, we treat every service as a masterpiece.{' '}
+            <strong className="font-bold">We don't just cut; we style</strong>, ensuring every visit is an indulgent retreat that leaves you looking and feeling your absolute best.
           </p>
 
           <div className="mt-[50px] w-full flex justify-end items-center">
