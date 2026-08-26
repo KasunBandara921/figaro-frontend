@@ -44,23 +44,7 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Right white banner (testimonial) */}
-        <div className="hidden md:block col-span-12 md:col-span-4 lg:col-span-3 row-start-1 self-start justify-self-end">
-          <div className="bg-white/10 backdrop-blur-sm px-10 py-10 w-[360px]">
-            <Image
-              src="/images/5bcdd747d44cf472bb71b1b2_2.svg"
-              alt=""
-              width={68}
-              height={68}
-              className="mb-6"
-            />
-            <div className="h-px w-16 bg-white/25 mb-6" />
-            <p className="font-lora text-sm leading-6 text-white/90 mb-6">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.
-            </p>
-            <div className="font-great-vibes text-2xl text-white/90">Alfred Hordberg</div>
-          </div>
-        </div>
+
 
         {/* Bottom row: social (left) */}
         <div className="hidden lg:flex col-span-12 lg:col-span-3 row-start-2 self-end items-center gap-4 pb-10">
