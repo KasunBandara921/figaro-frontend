@@ -16,8 +16,7 @@ export default function Parallax() {
       <div className="flex w-[70%] max-w-[1400px] flex-col items-center justify-start text-center">
         <h2 className="font-playfair text-[45px] font-normal leading-[65px] text-white">You're unique</h2>
         <p className="mt-4 font-playfair text-[22px] leading-[38px] text-white/90">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          Risus pretium quam vulputate dignissim suspendisse in est ante. <em>Amet venenatis urna cursus eget nunc scelerisque viverra.</em>
+          Your style is your signature. At Figaro, we craft tailored experiences that celebrate your individuality, ensuring your look is as distinctive and unique as you are.
         </p>
         <Link
           href="#services"
