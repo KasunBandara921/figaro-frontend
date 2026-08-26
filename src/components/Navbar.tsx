@@ -26,7 +26,7 @@ export default function Navbar() {
           <div className="hidden md:flex space-x-8">
             <Link href="#about" className="hover:text-yellow-400 transition-colors">About us</Link>
             <Link href="#services" className="hover:text-yellow-400 transition-colors">Services</Link>
-            <Link href="#book" className="hover:text-yellow-400 transition-colors">Book</Link>
+            <Link href="#book" className="hover:text-yellow-400 transition-colors">Write us</Link>
             <Link href="#locations" className="hover:text-yellow-400 transition-colors">Locations</Link>
             <Link href="/login" className="hover:text-yellow-400 transition-colors">Login</Link>
           </div>
@@ -47,7 +47,7 @@ export default function Navbar() {
           <div className="md:hidden pb-4 space-y-2">
             <Link href="#about" className="block py-2 hover:text-yellow-400 transition-colors">About us</Link>
             <Link href="#services" className="block py-2 hover:text-yellow-400 transition-colors">Services</Link>
-            <Link href="#book" className="block py-2 hover:text-yellow-400 transition-colors">Book</Link>
+            <Link href="#book" className="block py-2 hover:text-yellow-400 transition-colors">Write us</Link>
             <Link href="#locations" className="block py-2 hover:text-yellow-400 transition-colors">Locations</Link>
             <Link href="/login" className="block py-2 hover:text-yellow-400 transition-colors">Login</Link>
           </div>
