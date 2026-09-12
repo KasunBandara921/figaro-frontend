@@ -19,7 +19,7 @@ export default function Locations() {
           <div className="mb-[40px] flex min-w-[200px] flex-col items-start justify-center border border-white p-[30px] text-white lg:mb-0 lg:mr-[10px]">
             <h3 className="font-playfair text-[38px] font-normal leading-[40px]">New York</h3>
             <p className="font-playfair text-[20px] leading-[30px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.
+              Our flagship salon in the heart of Manhattan, delivering cutting-edge urban styling and classic grooming with a NYC edge.
             </p>
             <ul className="mt-[30px] w-full list-none p-0">
               <li className="mb-[40px]">
@@ -38,7 +38,7 @@ export default function Locations() {
           <div className="mb-[40px] flex min-w-[200px] flex-col items-start justify-center border border-white p-[30px] text-white lg:mb-0 lg:mr-[10px]">
             <h3 className="font-playfair text-[38px] font-normal leading-[40px]">Milan</h3>
             <p className="font-playfair text-[20px] leading-[30px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.
+              Situated in the world capital of fashion, bringing European sophistication, high-end styling, and trendsetting beauty trends.
             </p>
             <ul className="mt-[30px] w-full list-none p-0">
               <li className="mb-[40px]">
@@ -57,7 +57,7 @@ export default function Locations() {
           <div className="flex min-w-[200px] flex-col items-start justify-center border border-white p-[30px] text-white">
             <h3 className="font-playfair text-[38px] font-normal leading-[40px]">Los Angeles</h3>
             <p className="font-playfair text-[20px] leading-[30px]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.
+              Our Beverly Hills sanctuary offering sun-kissed color transformations, premium hair care, and red-carpet-ready styles.
             </p>
             <ul className="mt-[30px] w-full list-none p-0">
               <li className="mb-[40px]">

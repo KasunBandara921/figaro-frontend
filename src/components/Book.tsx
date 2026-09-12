@@ -32,10 +32,10 @@ export default function Book() {
     >
       <div className="flex w-[90%] max-w-[1400px] flex-col items-start">
         <h2 className="mt-[10px] font-playfair text-[45px] font-normal leading-[65px] text-neutral-800">
-          Book an appointment
+          Write us
         </h2>
         <p className="font-playfair text-[18px] leading-[30px] text-neutral-800">
-          Give us a call today and book an appointment in one of our salons.
+          Have a question or want to get in touch? Send us a message or give us a call.
         </p>
 
         <div className="mt-[100px] flex w-full flex-col justify-between lg:flex-row">
